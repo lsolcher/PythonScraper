@@ -54,20 +54,19 @@ for link in article_links:
 # get article text and save it to file
 print(len(article_links))
 for idx, article in enumerate(article_links):
-    if(idx < 10):
-        try:
-            thisArticle = []
-            article_url = urlopen(article)
-            soup_article = BeautifulSoup(article_url, 'html.parser')
-            for text in soup_article.findAll('p'):
-                thisArticle.append(text.getText())
-            fileId = 'articles\\SPON_' + str(idx) + '.txt'
-            fileName = os.path.join(dirpath, fileId)
-            sponFile = open(fileName, 'w+', encoding='utf-8') 
-            sponFile.write("%s\n" % thisArticle)
-            sponFile.close
-        except Exception:
-            logger.exception("Error in parsing")
+    try:
+        thisArticle = []
+        article_url = urlopen(article)
+        soup_article = BeautifulSoup(article_url, 'html.parser')
+        for text in soup_article.findAll('p'):
+            thisArticle.append(text.getText())
+        fileId = 'articles\\SPON_' + str(idx) + '.txt'
+        fileName = os.path.join(dirpath, fileId)
+        sponFile = open(fileName, 'w+', encoding='utf-8') 
+        sponFile.write("%s\n" % thisArticle)
+        sponFile.close
+    except Exception:
+        logger.exception("Error in parsing")
                 
     
     
