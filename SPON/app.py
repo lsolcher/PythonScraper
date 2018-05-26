@@ -34,7 +34,6 @@ for iteration in range(0, 10):
         if iteration > 0:
             nextUrlTag = soup_mainpage.find('a', href=True, text='Mehr Artikel')
             URL ='http://www.spiegel.de' + nextUrlTag['href']
-            print(URL)
             SPON_PAGE = urlopen(URL)
             soup_mainpage = BeautifulSoup(SPON_PAGE, 'html.parser')
         for link in soup_mainpage.findAll('a', attrs={'href': re.compile("^(?!http://.*$).*")}):
@@ -46,8 +45,8 @@ for iteration in range(0, 10):
 
 article_links = list(set(article_links)) # eliminate duplicate entries
 
-spon_links = os.path.join(dirpath, "sponLinks") 
-linkFile = open(spon_links, 'w')   
+spon_links = os.path.join(dirpath, "sponLinks.txt") 
+linkFile = open(spon_links, 'w+')   
 for link in article_links:
     linkFile.write("%s\n" % link)
     
@@ -55,19 +54,20 @@ for link in article_links:
 # get article text and save it to file
 print(len(article_links))
 for idx, article in enumerate(article_links):
-    try:
-        thisArticle = []
-        article_url = urlopen(article)
-        soup_article = BeautifulSoup(article_url, 'html.parser')
-        for text in soup_article.findAll('p'):
-            thisArticle.append(text.getText())
-        fileId = 'articles\\SPON_' + idx
-        fileName = os.path.join(dirpath, "filename")
-        sponFile = open(fileName, 'w+', encoding='utf-8') 
-        sponFile.write("%s\n" % article)
-        print(idx)
-    except Exception:
-        logger.exception("Error in parsing")
+    if(idx < 10):
+        try:
+            thisArticle = []
+            article_url = urlopen(article)
+            soup_article = BeautifulSoup(article_url, 'html.parser')
+            for text in soup_article.findAll('p'):
+                thisArticle.append(text.getText())
+            fileId = 'articles\\SPON_' + str(idx) + '.txt'
+            fileName = os.path.join(dirpath, fileId)
+            sponFile = open(fileName, 'w+', encoding='utf-8') 
+            sponFile.write("%s\n" % thisArticle)
+            sponFile.close
+        except Exception:
+            logger.exception("Error in parsing")
                 
     
     
