@@ -12,20 +12,9 @@ import logging
 import os.path
 
 def scrape():
-    dirpath = os.path.abspath(os.path.dirname(__file__))
-    print(dirpath)
-    
-    logger = logging.getLogger('myapp')
-    logfile = os.path.join(dirpath, "logs\\log.log")
-    logfileDir = os.path.join(dirpath, 'logs\\')
-    if not os.path.exists(logfileDir):
-        os.makedirs(logfileDir)
-    hdlr = logging.FileHandler(logfile)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    hdlr.setFormatter(formatter)
-    logger.addHandler(hdlr) 
-    
-    
+    logger = logging.getLogger('root')
+    logger.info('start scraping spon')
+      
     # Websites to scrape
     URL = 'http://www.spiegel.de/politik'
     SPON_PAGE = urlopen(URL)
@@ -75,4 +64,4 @@ def scrape():
     
     
 
- 
+ """
