@@ -16,18 +16,30 @@ dirpath = os.path.abspath(os.path.dirname(__file__))
 print(dirpath)
 
 logger = logging.getLogger('myapp')
-logfile = os.path.join(dirpath, "logs\\log.log")
+logfileDir = os.path.join(dirpath, 'logs\\')
+if not os.path.exists(logfileDir):
+    os.makedirs(logfileDir)
+logfile = os.path.join(logfileDir, "log.log")
 hdlr = logging.FileHandler(logfile)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
+logger.setLevel(logging.INFO)
 
 # Websites to scrape
-URL = 'http://www.spiegel.de/politik'
-SPON_PAGE = urlopen(URL)
-soup_mainpage = BeautifulSoup(SPON_PAGE, 'html.parser')
 
-# get all article URLs
+
+article_links = []
+# get recent articles
+URL = 'https://www.zeit.de/politik/index'
+PAGE = urlopen(URL)
+soup_mainpage = BeautifulSoup(PAGE, 'html.parser')
+for link in soup_mainpage.findAll('a', attrs={'href': re.compile('^https://www.zeit.de/politik/')}):
+    if '.html' in link['href'] and '-a-' in link['href']: # eliminate non-articles
+        article_links.append(link['href'])
+        logger.info('found recent article: ' + link['href'])
+    
+"""
 article_links = []
 for iteration in range(0, 10): 
     try:
@@ -68,7 +80,7 @@ for idx, article in enumerate(article_links):
     except Exception:
         logger.exception("Error in parsing")
                 
-    
+"""  
     
 
  

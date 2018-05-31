@@ -1,2 +1,0 @@
-- restrict until relative date
-- remove all text after article ends
