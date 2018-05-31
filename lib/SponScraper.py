@@ -11,9 +11,11 @@ import re
 import logging
 import os.path
 
-def scrape():
+def scrape(dirpath):
     logger = logging.getLogger('root')
     logger.info('start scraping spon')
+    
+
       
     # Websites to scrape
     URL = 'http://www.spiegel.de/politik'
@@ -33,12 +35,12 @@ def scrape():
                 if '.html' in link['href'] and '-a-' in link['href']: #eliminate non-articles - SPON marks artikels with -a-
                     article_links.append('http://www.spiegel.de' + link['href'])
         except Exception:
-            logger.exception("Error in fetching links")
+            logger.exception("Error while fetching links")
     
     
     article_links = list(set(article_links)) # eliminate duplicate entries
     
-    spon_links = os.path.join(dirpath, "sponLinks.txt") 
+    spon_links = os.path.join(dirpath, "articleLinks\\sponLinks.txt") 
     linkFile = open(spon_links, 'w+')   
     for link in article_links:
         linkFile.write("%s\n" % link)
@@ -59,9 +61,8 @@ def scrape():
             sponFile.write("%s\n" % thisArticle)
             sponFile.close
         except Exception:
-            logger.exception("Error in parsing")
+            logger.exception("Error while parsing")
                 
     
     
 
- """

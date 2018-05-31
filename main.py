@@ -3,7 +3,7 @@ from lib import SponScraper
 import os.path
 
 # logger
-i = 10
+datapath = os.path.abspath(os.path.dirname(__file__)) + '\\data\\'
 logger = log.setup_custom_logger('root')
 logger.info('start scraping')
-SponScraper.scrape()
+SponScraper.scrape(datapath)
