@@ -10,7 +10,7 @@ def setup_custom_logger(name):
     if not os.path.exists(logfileDir):
         os.makedirs(logfileDir)
     logfile = os.path.join(dirpath, "logs\\log.log")
-    handler = logging.FileHandler(logfile)
+    handler = logging.FileHandler(logfile, mode='w')
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(formatter)
     logger.addHandler(handler)

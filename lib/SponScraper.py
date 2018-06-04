@@ -55,7 +55,7 @@ def scrape(dirpath):
             soup_article = BeautifulSoup(article_url, 'html.parser')
             for text in soup_article.findAll('p'):
                 thisArticle.append(text.getText())
-            fileId = 'articles\\SPON_' + str(idx) + '.txt'
+            fileId = 'articles\\SPON\\SPON_' + str(idx) + '.txt'
             fileName = os.path.join(dirpath, fileId)
             sponFile = open(fileName, 'w+', encoding='utf-8') 
             sponFile.write("%s\n" % thisArticle)
