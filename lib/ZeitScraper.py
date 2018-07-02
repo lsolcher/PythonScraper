@@ -24,13 +24,11 @@ def scrape(dirpath):
     PAGE = urlopen(URL)
     soup_mainpage = BeautifulSoup(PAGE, 'html.parser')
     for link in soup_mainpage.findAll('a', attrs={'href': re.compile('^https://www.zeit.de/politik/')}):
-        #print(link['href'])
-        #if '.html' in link['href'] and '-a-' in link['href']: # eliminate non-articles
         article_links.append(link['href'])
         logger.info('found recent article: ' + link['href'])
         
     article_links = list(set(article_links)) # eliminate duplicate entries
-    zeitLinks = os.path.join(dirpath, "zeitLinks.txt") 
+    zeitLinks = os.path.join(dirpath, "articleLinks\\zeitLinks.txt")
     
     
     linkFile = open(zeitLinks, 'w+')   
@@ -42,15 +40,17 @@ def scrape(dirpath):
     print(len(article_links))
     for idx, article in enumerate(article_links):
         try:
-            thisArticle = []
             article_url = urlopen(article)
             soup_article = BeautifulSoup(article_url, 'html.parser')
+            all_text = ''
             for text in soup_article.findAll('p'):
-                thisArticle.append(text.getText())
+                all_text += text.getText()
+            all_text = all_text.split('Bitte melden Sie sich an, um zu kommentieren', 1)[0]
+            all_text = all_text.replace('ZEIT ONLINE', 'SOURCE')
             fileId = 'articles\\ZEIT\\ZEIT_' + str(idx) + '.txt'
             fileName = os.path.join(dirpath, fileId)
             sponFile = open(fileName, 'w+', encoding='utf-8') 
-            sponFile.write("%s\n" % thisArticle)
+            sponFile.write("%s\n" % all_text)
             sponFile.close
         except Exception:
             logger.exception("Error in parsing")    

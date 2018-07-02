@@ -10,13 +10,13 @@ from bs4 import BeautifulSoup
 import re
 import logging
 import os.path
+import string
+
 
 def scrape(dirpath):
     logger = logging.getLogger('root')
     logger.info('start scraping spon')
-    
 
-      
     # Websites to scrape
     URL = 'http://www.spiegel.de/politik'
     SPON_PAGE = urlopen(URL)
@@ -53,14 +53,19 @@ def scrape(dirpath):
             thisArticle = []
             article_url = urlopen(article)
             soup_article = BeautifulSoup(article_url, 'html.parser')
+            all_text = ''
             for text in soup_article.findAll('p'):
-                thisArticle.append(text.getText())
+                all_text += text.getText()
+            all_text = all_text.split('Wer steckt hinter Civey?')[0]
+            all_text = all_text.split('© SPIEGEL ONLINE', 1)[0]
+            all_text = all_text.replace('SPIEGEL ONLINE', 'SOURCE')
             fileId = 'articles\\SPON\\SPON_' + str(idx) + '.txt'
             fileName = os.path.join(dirpath, fileId)
             sponFile = open(fileName, 'w+', encoding='utf-8') 
-            sponFile.write("%s\n" % thisArticle)
+            sponFile.write("%s\n" % all_text)
             sponFile.close
         except Exception:
+            print(Exception)
             logger.exception("Error while parsing")
                 
     
