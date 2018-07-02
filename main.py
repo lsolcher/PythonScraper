@@ -7,6 +7,6 @@ datapath = os.path.abspath(os.path.dirname(__file__)) + '\\data\\'
 logger = log.setup_custom_logger('root')
 logger.info('start scraping')
 
-#JungeFreiheitScraper.scrape(datapath)
+JungeFreiheitScraper.scrape(datapath)
 SponScraper.scrape(datapath)
-#ZeitScraper.scrape(datapath)
+ZeitScraper.scrape(datapath)

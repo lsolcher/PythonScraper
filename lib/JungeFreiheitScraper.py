@@ -31,7 +31,7 @@ def scrape(dirpath):
                 PAGE = urlopen(URL)
                 soup_mainpage = BeautifulSoup(PAGE, 'html.parser')
             for link in soup_mainpage.findAll('a', attrs={'href': re.compile("^https://jungefreiheit.de/.*")}):
-                if 'politik' in link['href'] and '2018' in link['href']:  # eliminate non-articles - SPON marks artikels with -a-
+                if 'politik' in link['href'] and '2018' in link['href'] and '/#comments' not in link['href']:  # eliminate non-articles - SPON marks artikels with -a-
                     article_links.append(link['href'])
         except Exception:
             logger.exception("Error while fetching links")

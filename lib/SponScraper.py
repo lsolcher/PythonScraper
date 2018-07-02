@@ -32,7 +32,8 @@ def scrape(dirpath):
                 SPON_PAGE = urlopen(URL)
                 soup_mainpage = BeautifulSoup(SPON_PAGE, 'html.parser')
             for link in soup_mainpage.findAll('a', attrs={'href': re.compile("^(?!http://.*$).*")}):
-                if '.html' in link['href'] and '-a-' in link['href']: #eliminate non-articles - SPON marks artikels with -a-
+                if '.html' in link['href'] and '-a-' in link['href'] and '/politik/' in link['href'] \
+                        and 'news-' not in link['href']: #eliminate non-articles - SPON marks artikels with -a-
                     article_links.append('http://www.spiegel.de' + link['href'])
         except Exception:
             logger.exception("Error while fetching links")
@@ -56,14 +57,17 @@ def scrape(dirpath):
             all_text = ''
             for text in soup_article.findAll('p'):
                 all_text += text.getText()
-            all_text = all_text.split('Wer steckt hinter Civey?')[0]
+            all_text = all_text.split('Wer steckt hinter Civey?', 1)[0]
             all_text = all_text.split('© SPIEGEL ONLINE', 1)[0]
             all_text = all_text.replace('SPIEGEL ONLINE', 'SOURCE')
-            fileId = 'articles\\SPON\\SPON_' + str(idx) + '.txt'
-            fileName = os.path.join(dirpath, fileId)
-            sponFile = open(fileName, 'w+', encoding='utf-8') 
-            sponFile.write("%s\n" % all_text)
-            sponFile.close
+            all_text = all_text.replace('SPIEGEL+', 'SOURCE')
+            all_text = all_text.replace('SPIEGEL', 'SOURCE')
+            if all_text:
+                fileId = 'articles\\SPON\\SPON_' + str(idx) + '.txt'
+                fileName = os.path.join(dirpath, fileId)
+                sponFile = open(fileName, 'w+', encoding='utf-8')
+                sponFile.write("%s\n" % all_text)
+                sponFile.close
         except Exception:
             print(Exception)
             logger.exception("Error while parsing")
