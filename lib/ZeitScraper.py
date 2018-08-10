@@ -18,11 +18,20 @@ def scrape(dirpath):
     # Websites to scrape
     
     
-    article_links = []
-    # get recent articles
-    URL = 'https://www.zeit.de/politik/index'
-    PAGE = urlopen(URL)
-    soup_mainpage = BeautifulSoup(PAGE, 'html.parser')
+    # Websites to scrape
+    URL = []
+    URL.append('http://www.spiegel.de/politik/')
+    URL.append('http://www.spiegel.de/thema/meinung/')
+    URL.append('http://www.spiegel.de/wirtschaft/')
+    URL.append('http://www.spiegel.de/panorama/')
+    URL.append('http://www.spiegel.de/kultur/')
+    PAGE = []
+    for url in URL:
+        
+        PAGE.append(urlopen(url))
+    soup_mainpages = []
+    for page in PAGE:
+        soup_mainpages.append(BeautifulSoup(page, 'html.parser'))
     for link in soup_mainpage.findAll('a', attrs={'href': re.compile('^https://www.zeit.de/politik/')}):
         article_links.append(link['href'])
         logger.info('found recent article: ' + link['href'])

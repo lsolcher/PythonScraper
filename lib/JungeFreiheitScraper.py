@@ -17,27 +17,43 @@ def scrape(dirpath):
     logger.info('start scraping junge freiheit')
 
     # Websites to scrape
-    URL = 'https://jungefreiheit.de/kategorie/politik/'
-    PAGE = urlopen(URL)
-    soup_mainpage = BeautifulSoup(PAGE, 'html.parser')
+    URL = []
+    URL.append('https://jungefreiheit.de/kategorie/politik/')
+    URL.append('https://jungefreiheit.de/kategorie/wirtschaft/')
+    URL.append('https://jungefreiheit.de/kategorie/kultur/')
+    URL.append('https://jungefreiheit.de/kategorie/wissen/')
+    URL.append('https://jungefreiheit.de/kategorie/debatte/')
+    PAGE = []
+    for url in URL:
+        PAGE.append(urlopen(url))
+    soup_mainpages = []
+    for page in PAGE:
+        soup_mainpages.append(BeautifulSoup(page, 'html.parser'))
 
     # get all article URLs
-    article_links = []
-    for iteration in range(0, 10):
-        try:
-            if iteration > 0:
-                nextUrlTag = soup_mainpage.find('a', href=True, text=re.compile('Nächste Seite'))
-                URL = nextUrlTag['href']
-                PAGE = urlopen(URL)
-                soup_mainpage = BeautifulSoup(PAGE, 'html.parser')
-            for link in soup_mainpage.findAll('a', attrs={'href': re.compile("^https://jungefreiheit.de/.*")}):
-                if 'politik' in link['href'] and '2018' in link['href'] and '/#comments' not in link['href']:  # eliminate non-articles - SPON marks artikels with -a-
-                    article_links.append(link['href'])
-        except Exception:
-            logger.exception("Error while fetching links")
+    article_links = set()
+    for i, category in enumerate(soup_mainpages):
+        for iteration in range(0, 100):
+            try:
+                if iteration > 0:
+                    nextUrlTag = category.find('a', href=True, text=re.compile('Nächste Seite'))
+                    URL[i] = nextUrlTag['href']
+                    PAGE[i] = urlopen(URL[i])
+                    category = BeautifulSoup(PAGE[i], 'html.parser')
+                for link in category.findAll('a', attrs={'href': re.compile("^https://jungefreiheit.de/.*")}):
+                    if link['href'] and '2018' in link['href'] and '/#comments' not in link['href']:  # eliminate non-articles
+                        article_links.add(link['href'])
+                        if len(article_links) % 100 == 0:
+                            print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
+            except TypeError:
+                logger.exception('Done with category {}. Moving to the next one.'.format(i))
+                range = 100
+                i += 1
+            except Exception:
+                logger.exception("Error while fetching links")
 
     article_links = list(set(article_links))  # eliminate duplicate entries
-
+    print('Found {} unique articles in total. Start writing...'.format(len(article_links)))
     links = os.path.join(dirpath, "articleLinks\\jfLinks.txt")
     linkFile = open(links, 'w+')
     for link in article_links:
@@ -47,14 +63,16 @@ def scrape(dirpath):
     print(len(article_links))
     for idx, article in enumerate(article_links):
         try:
+            if idx % 100 == 0:
+                print('Wrote {} of {} articles.'.format(idx, len(article_links)))
             article_url = urlopen(article)
             soup_article = BeautifulSoup(article_url, 'html.parser')
             article = soup_article.find("div", {"class": "entry-content"}).findAll('p')
             text = ''
-            for element in article:
-                text += '\n' + ''.join(element.findAll(text=True))
-            replace = re.compile('junge freiheit', re.IGNORECASE)
-            text = replace.sub(text, text)
+            for idy, element in enumerate(article):
+                if idy < len(article) - 1 and idy != 0: # remove press agency parentheses and header
+                    text += ''.join(element.findAll(text=True))
+            text = re.sub(r"\b[A-Z]+(?:\s+[A-Z]+)*\b. ", '', text)  # remove uppercased city
             fileId = 'articles\\JF\\JF_' + str(idx) + '.txt'
             fileName = os.path.join(dirpath, fileId)
             sponFile = open(fileName, 'w+', encoding='utf-8')
